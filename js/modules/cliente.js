@@ -11,7 +11,9 @@ const Cliente = {
   _getSession() { return Auth.getSession(); },
   _getClienteProfile() {
     const s = this._getSession();
-    return s ? DB.findOne('clientes', c => c.usuarioId === s.userId) : null;
+    if (!s) return null;
+    return DB.findOne('clientes', c => c.usuarioId === s.userId) ||
+           (s.email ? DB.findOne('clientes', c => c.email && c.email.toLowerCase() === s.email.toLowerCase()) : null);
   },
 
   // ─── DASHBOARD ───────────────────────────────────────────
