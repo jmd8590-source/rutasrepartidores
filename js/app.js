@@ -72,12 +72,26 @@ const App = {
       // Ocultar pantalla de carga
       await this._hideSplash();
 
+      // Comprobar si viene un token de invitación en la URL (?token=INV-XXXXX)
+      const urlParams = new URLSearchParams(window.location.search);
+      const inviteToken = urlParams.get('token') || (window.location.hash.includes('token=') ? window.location.hash.split('token=')[1] : null);
+
       // Comprobar sesión
       const session = Auth.getSession();
-      if (session) {
+      if (session && !inviteToken) {
         this.showApp(session);
       } else {
-        this.showAuth('login');
+        this.showAuth(inviteToken ? 'register' : 'login');
+        if (inviteToken) {
+          setTimeout(() => {
+            const input = document.getElementById('reg-token');
+            if (input) {
+              input.value = inviteToken.trim().toUpperCase();
+              document.getElementById('verify-token-btn')?.click();
+              Toast.info('Código de invitación cargado automáticamente desde el enlace / QR');
+            }
+          }, 300);
+        }
       }
 
       // Service Worker

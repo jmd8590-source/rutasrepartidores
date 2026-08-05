@@ -346,6 +346,17 @@ const Utils = {
     setTimeout(() => { w.print(); }, 500);
   },
 
+  // Generar URL de código QR
+  getQRCodeURL(data, size = 220) {
+    return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(data)}`;
+  },
+
+  // Generar enlace completo de registro
+  getRegisterLink(token) {
+    const origin = window.location.origin + window.location.pathname;
+    return `${origin}?token=${encodeURIComponent(token)}`;
+  },
+
   // Obtener nombre y email del usuario actual
   getClienteProfile(usuarioId) {
     return DB.findOne('clientes', c => c.usuarioId === usuarioId);

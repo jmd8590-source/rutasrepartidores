@@ -239,19 +239,22 @@ const Repartidor = {
       <!-- Invitaciones activas -->
       <div class="card mt-4">
         <div class="card-header">
-          <h3>🎫 Códigos de Invitación Activos</h3>
+          <h3>🎫 Códigos e Invitaciones QR Activos</h3>
         </div>
         <div class="card-body">
           ${(() => {
             const invs = DB.find('invitaciones', i => i.rutaId === rutaId && !i.usada && new Date() < new Date(i.expiraEn));
             if (!invs.length) return '<p class="text-muted text-sm">No hay invitaciones activas</p>';
             return invs.map(i => `
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border-light)">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border-light);flex-wrap:wrap;gap:.5rem">
                 <div>
                   <code style="font-family:monospace;font-size:.9rem;font-weight:700;color:var(--primary)">${Utils.esc(i.token)}</code>
                   <span style="font-size:.8rem;color:var(--muted);margin-left:.75rem">Expira: ${Utils.formatDate(i.expiraEn, 'datetime')}</span>
                 </div>
-                <button class="btn btn--outline btn--xs" onclick="navigator.clipboard.writeText('${Utils.esc(i.token)}').then(()=>Toast.success('Código copiado'))">📋 Copiar</button>
+                <div style="display:flex;gap:.35rem">
+                  <button class="btn btn--primary btn--xs" onclick="Repartidor.showQRModal('${Utils.esc(i.token)}')">📲 QR / Enlace</button>
+                  <button class="btn btn--outline btn--xs" onclick="navigator.clipboard.writeText('${Utils.esc(Utils.getRegisterLink(i.token))}').then(()=>Toast.success('Enlace copiado'))">📋 Copiar Enlace</button>
+                </div>
               </div>
             `).join('');
           })()}
@@ -265,26 +268,52 @@ const Repartidor = {
     const rutaId = this._getRutaId();
     if (!rutaId) { Toast.error('Sin ruta asignada'); return; }
     const inv = Auth.createInvitation(rutaId, session.userId);
-    Modal.show('✉️ Código de Invitación Generado', `
-      <div style="text-align:center;padding:1.5rem 0">
-        <div style="font-size:.875rem;color:var(--muted);margin-bottom:.75rem">Comparte este código con tu cliente:</div>
-        <div style="font-family:monospace;font-size:2rem;font-weight:800;color:var(--primary);letter-spacing:.1em;padding:1rem;background:var(--primary-50);border-radius:var(--radius-md)">
-          ${Utils.esc(inv.token)}
+    this.showQRModal(inv.token);
+  },
+
+  showQRModal(token) {
+    const link = Utils.getRegisterLink(token);
+    const qrUrl = Utils.getQRCodeURL(link, 220);
+    const waText = encodeURIComponent(`¡Hola! Accede al registro de clientes de Pollos Fuentes mediante este enlace: ${link}`);
+
+    Modal.show('📱 QR y Enlace de Registro para Cliente', `
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="font-size:.875rem;color:var(--muted);margin-bottom:1rem">
+          Escanea el código QR con la cámara del móvil para acceder directamente al registro:
         </div>
-        <div style="font-size:.875rem;color:var(--muted);margin-top:.75rem">
-          Válido 7 días · Expira: ${Utils.formatDate(inv.expiraEn, 'datetime')}
+
+        <!-- Código QR -->
+        <div style="background:#fff;padding:1rem;display:inline-block;border-radius:var(--radius-md);box-shadow:0 2px 10px rgba(0,0,0,0.1);margin-bottom:1rem;border:1px solid var(--border)">
+          <img src="${qrUrl}" alt="QR Registro" style="width:200px;height:200px;display:block">
         </div>
-        <div style="margin-top:.75rem;font-size:.875rem">
-          El cliente deberá usar este código en la pantalla de registro de la aplicación.
+
+        <div style="font-size:.8rem;color:var(--muted);margin-bottom:.25rem">Código de invitación:</div>
+        <div style="font-family:monospace;font-size:1.5rem;font-weight:800;color:var(--primary);letter-spacing:.1em;margin-bottom:1rem">
+          ${Utils.esc(token)}
+        </div>
+
+        <!-- Enlace web -->
+        <div class="form-group mb-3 text-left">
+          <label style="font-size:.8rem;font-weight:600">Enlace directo de registro:</label>
+          <div style="display:flex;gap:.5rem">
+            <input type="text" value="${Utils.esc(link)}" readonly style="font-size:.8rem;background:var(--bg)">
+            <button class="btn btn--outline btn--sm" onclick="navigator.clipboard.writeText('${Utils.esc(link)}').then(()=>Toast.success('Enlace copiado'))">📋 Copiar</button>
+          </div>
+        </div>
+
+        <!-- Acciones de compartir -->
+        <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:1.25rem">
+          <a href="https://wa.me/?text=${waText}" target="_blank" class="btn btn--success btn--sm" style="text-decoration:none">
+            💬 Compartir por WhatsApp
+          </a>
+          <button class="btn btn--secondary btn--sm" onclick="Utils.printSection('<div style=\\'text-align:center;padding:40px\\'><h1>Pollos Fuentes</h1><h2>Registro de Nuevo Cliente</h2><p>Escanea este código QR con tu móvil para registrarte:</p><img src=\\'${qrUrl}\\' style=\\'width:250px;height:250px;margin:20px 0\\'><p style=\\'font-family:monospace;font-size:24px;font-weight:bold;color:#F97316\\'>${token}</p><p style=\\'font-size:12px;color:#666\\'>Válido por 7 días</p></div>', 'QR Registro')">
+            🖨 Imprimir QR
+          </button>
         </div>
       </div>
     `, [
-      { text: 'Cerrar', cls: 'btn--outline', action: () => Modal.hide() },
-      { text: '📋 Copiar Código', cls: 'btn--primary', action: () => {
-        navigator.clipboard.writeText(inv.token).then(() => Toast.success('Código copiado al portapapeles'));
-      }}
+      { text: 'Cerrar', cls: 'btn--outline', action: () => Modal.hide() }
     ]);
-    Toast.success('Invitación generada');
   },
 
   showClienteDetalle(clienteId) {

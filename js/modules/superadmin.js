@@ -228,6 +228,7 @@ const SuperAdmin = {
                   <td><span class="badge badge--info">${numClientes} clientes</span></td>
                   <td>${Utils.activeBadge(r.activa)}</td>
                   <td class="actions-cell">
+                    <button class="btn btn--primary btn--xs" onclick="SuperAdmin.generarQRParaRuta('${r.id}')">📲 QR Cliente</button>
                     <button class="btn btn--outline btn--xs" onclick="SuperAdmin.showRutaForm('${r.id}')">✏️ Editar</button>
                     <button class="btn btn--${r.activa ? 'warning' : 'success'} btn--xs" onclick="SuperAdmin.toggleRuta('${r.id}')">
                       ${r.activa ? '⏸ Desactivar' : '▶ Activar'}
@@ -751,7 +752,9 @@ const SuperAdmin = {
   renderClientes() {
     document.getElementById('page-title').textContent = 'Gestión de Clientes';
     document.getElementById('page-subtitle').textContent = 'Todos los clientes del sistema';
-    document.getElementById('header-actions').innerHTML = '';
+    document.getElementById('header-actions').innerHTML = `
+      <button class="btn btn--primary" onclick="SuperAdmin.showGenerarQRModal()">📲 Generar QR / Enlace Cliente</button>
+    `;
 
     const clientes = DB.get('clientes');
     const rutas = DB.get('rutas');
@@ -879,6 +882,38 @@ const SuperAdmin = {
     Audit.log('APROBAR_CLIENTE', 'cliente', clienteId, { estado: nuevoEstado, nombreNegocio: c.nombreNegocio });
     Toast.success(`Cliente ${labels[nuevoEstado] || nuevoEstado}`);
     Router.go('/admin/clientes');
+  },
+
+  generarQRParaRuta(rutaId) {
+    const session = Auth.getSession();
+    if (!session) return;
+    const inv = Auth.createInvitation(rutaId, session.userId);
+    Repartidor.showQRModal(inv.token);
+  },
+
+  showGenerarQRModal() {
+    const rutas = DB.find('rutas', r => r.activa);
+    if (!rutas.length) { Toast.warning('Debes crear primero al menos una ruta activa'); return; }
+
+    Modal.show('📱 Generar QR / Enlace de Registro', `
+      <div class="form-group mb-3">
+        <label>Seleccionar Ruta para el Cliente *</label>
+        <select id="qr-select-ruta" class="filter-select" style="width:100%">
+          ${rutas.map(r => `<option value="${r.id}">${Utils.esc(r.nombre)}</option>`).join('')}
+        </select>
+        <span class="form-hint">El cliente quedará vinculado automáticamente a la ruta seleccionada</span>
+      </div>
+    `, [
+      { text: 'Cancelar', cls: 'btn--outline', action: () => Modal.hide() },
+      { text: '⚡ Generar QR y Enlace', cls: 'btn--primary', action: () => {
+        const rutaId = document.getElementById('qr-select-ruta')?.value;
+        const session = Auth.getSession();
+        if (!rutaId || !session) return;
+        Modal.hide();
+        const inv = Auth.createInvitation(rutaId, session.userId);
+        Repartidor.showQRModal(inv.token);
+      }}
+    ]);
   },
 
   // ─── PRODUCTOS ───────────────────────────────────────────
