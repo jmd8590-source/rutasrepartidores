@@ -816,6 +816,21 @@ const Cliente = {
           </div>
 
           <div class="card mb-4">
+            <div class="card-header"><h3>🛡️ Sesiones y Dispositivos</h3></div>
+            <div class="card-body">
+              <p style="font-size:.875rem;color:var(--muted);margin-bottom:.5rem">
+                Dispositivo actual: <strong>${Utils.esc(session.deviceInfo || 'Navegador Web')}</strong>
+              </p>
+              <p style="font-size:.75rem;color:var(--muted);margin-bottom:1rem">
+                Si has iniciado sesión en otro teléfono o navegador, puedes invalidar las demás sesiones activas por seguridad.
+              </p>
+              <button class="btn btn--warning btn--sm" onclick="Cliente.cerrarOtrasSesiones()">
+                🔒 Cerrar sesión en los demás dispositivos
+              </button>
+            </div>
+          </div>
+
+          <div class="card mb-4">
             <div class="card-header"><h3>📋 Mis Datos (RGPD)</h3></div>
             <div class="card-body">
               <p style="font-size:.875rem;color:var(--muted);margin-bottom:1rem">
@@ -922,5 +937,17 @@ const Cliente = {
         setTimeout(() => { Auth.logout(); App.showAuth(); }, 2000);
       }}
     ]);
+  },
+
+  cerrarOtrasSesiones() {
+    const session = this._getSession();
+    if (!session) return;
+    const res = Auth.invalidateOtherSessions(session.userId);
+    if (res.success) {
+      Toast.success('🔒 Las sesiones en otros dispositivos han sido cerradas.');
+      this.renderPerfil();
+    } else {
+      Toast.error(res.error || 'Error al cerrar sesiones.');
+    }
   }
 };

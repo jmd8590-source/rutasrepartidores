@@ -60,7 +60,8 @@ const Auth = {
       }
     }
 
-    // Crear sesión
+    // Crear sesión única por dispositivo
+    const sessionToken = Utils.generateToken('tok');
     const session = {
       userId: user.id,
       email: user.email,
@@ -68,20 +69,23 @@ const Auth = {
       nombre: user.nombre,
       apellidos: user.apellidos || '',
       rutaId: user.rutaId || null,
-      token: Utils.generateToken('tok'),
+      token: sessionToken,
+      deviceInfo: navigator.userAgent.includes('Mobile') ? '📱 Dispositivo Móvil' : '💻 Navegador Web / Escritorio',
       createdAt: Utils.now(),
       expiresAt: new Date(Date.now() + this.SESSION_HOURS * 3600 * 1000).toISOString()
     };
     sessionStorage.setItem(this.SESSION_KEY, JSON.stringify(session));
 
-    // Actualizar último acceso y resetear intentos
+    // Actualizar token activo en base de datos para invalidar sesiones concurrentes anteriores
     DB.update('users', user.id, {
+      activeToken: sessionToken,
+      activeDevice: session.deviceInfo,
       ultimoAcceso: Utils.now(),
       loginAttempts: 0,
       lockedUntil: null
     });
 
-    Audit.log('LOGIN', 'user', user.id, { email: user.email, rol: user.rol });
+    Audit.log('LOGIN', 'user', user.id, { email: user.email, rol: user.rol, device: session.deviceInfo });
 
     return { success: true, session };
   },
@@ -95,7 +99,7 @@ const Auth = {
     sessionStorage.removeItem(this.SESSION_KEY);
   },
 
-  // --- Obtener sesión activa ---
+  // --- Obtener sesión activa con verificación de sesión concurrente ---
   getSession() {
     try {
       const data = sessionStorage.getItem(this.SESSION_KEY);
@@ -106,8 +110,35 @@ const Auth = {
         sessionStorage.removeItem(this.SESSION_KEY);
         return null;
       }
+
+      // Verificación de sesión concurrente: comprobar si el token activo en DB ha cambiado
+      const user = DB.findById('users', session.userId);
+      if (user && user.activeToken && user.activeToken !== session.token) {
+        sessionStorage.removeItem(this.SESSION_KEY);
+        if (typeof Toast !== 'undefined') {
+          Toast.warning('🔒 Tu sesión ha sido cerrada porque se ha iniciado sesión desde otro dispositivo.');
+        }
+        return null;
+      }
+
       return session;
     } catch { return null; }
+  },
+
+  // --- Cerrar sesión en todos los demás dispositivos ---
+  invalidateOtherSessions(userId) {
+    const session = this.getSession();
+    if (!session || session.userId !== userId) return { success: false, error: 'Sesión no válida' };
+
+    const newActiveToken = Utils.generateToken('tok');
+    DB.update('users', userId, { activeToken: newActiveToken });
+
+    // Actualizar token local para mantener la sesión actual
+    session.token = newActiveToken;
+    sessionStorage.setItem(this.SESSION_KEY, JSON.stringify(session));
+
+    Audit.log('EDITAR_USUARIO', 'user', userId, { accion: 'Cierre de sesiones concurrentes en otros dispositivos' });
+    return { success: true };
   },
 
   // --- Verificar autenticación ---
