@@ -1,6 +1,6 @@
-// ============================================================
+﻿// ============================================================
 //  CLIENTE.js — Módulo del Cliente
-//  Pollos Fuentes
+//  Pollos Frescos
 // ============================================================
 'use strict';
 
@@ -710,7 +710,7 @@ const Cliente = {
       <td>${Utils.formatCurrency(l.subtotal)}</td></tr>
     `).join('');
     Utils.printSection(`
-      <h1>Pollos Fuentes — Justificante de Pedido</h1>
+      <h1>Pollos Frescos — Justificante de Pedido</h1>
       <p><strong>Cliente:</strong> ${Utils.esc(cli?.nombreNegocio||'')} | <strong>NIF/CIF:</strong> ${Utils.esc(cli?.nifCif||'')}</p>
       <p><strong>Dirección:</strong> ${Utils.esc(cli?.direccion||'')}, ${Utils.esc(cli?.localidad||'')} (${Utils.esc(cli?.codigoPostal||'')})</p>
       <p><strong>Fecha pedido:</strong> ${Utils.formatDate(p.fecha)} | <strong>Estado:</strong> ${p.estado}</p>
@@ -718,7 +718,7 @@ const Cliente = {
       <table><thead><tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr></thead>
       <tbody>${lineasHtml}</tbody></table>
       <div class="total"><strong>TOTAL ESTIMADO: ${Utils.formatCurrency(p.total)}</strong></div>
-      <p style="margin-top:12px;font-size:10px;color:#888">Generado el ${Utils.formatDate(new Date(),'datetime')} · Pollos Fuentes S.L. · Este documento es un justificante provisional.</p>
+      <p style="margin-top:12px;font-size:10px;color:#888">Generado el ${Utils.formatDate(new Date(),'datetime')} · Pollos Frescos S.L. · Este documento es un justificante provisional.</p>
     `, 'Justificante de Pedido');
   },
 
@@ -910,7 +910,7 @@ const Cliente = {
       'Total pedidos': pedidos.length,
       'Consentimiento RGPD': user?.consentimientoFecha || ''
     }];
-    Utils.exportCSV(data, 'mis_datos_pollosfuentes');
+    Utils.exportCSV(data, 'mis_datos_PollosFrescos');
     Toast.success('Datos exportados correctamente');
   },
 

@@ -1,6 +1,6 @@
-// ============================================================
+﻿// ============================================================
 //  SUPERADMIN.js — Módulo del Superadministrador
-//  Pollos Fuentes
+//  Pollos Frescos
 // ============================================================
 'use strict';
 
@@ -1300,14 +1300,14 @@ const SuperAdmin = {
       <td>${Utils.formatCurrency(l.subtotal)}</td></tr>
     `).join('');
     Utils.printSection(`
-      <h1>Pollos Fuentes — Justificante de Pedido</h1>
+      <h1>Pollos Frescos — Justificante de Pedido</h1>
       <p><strong>Cliente:</strong> ${Utils.esc(cli?.nombreNegocio || '')} | <strong>NIF/CIF:</strong> ${Utils.esc(cli?.nifCif || '')}</p>
       <p><strong>Fecha:</strong> ${Utils.formatDate(p.fecha)} | <strong>Estado:</strong> ${p.estado} | <strong>Ruta:</strong> ${Utils.esc(Utils.getRutaNombre(p.rutaId))}</p>
       ${p.observaciones ? `<p><strong>Observaciones:</strong> ${Utils.esc(p.observaciones)}</p>` : ''}
       <table><thead><tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Subtotal</th></tr></thead>
       <tbody>${lineasHtml}</tbody></table>
       <div class="total"><strong>TOTAL: ${Utils.formatCurrency(p.total)}</strong></div>
-      <p style="margin-top:16px;font-size:10px;color:#888">Generado el ${Utils.formatDate(new Date(), 'datetime')} · Pollos Fuentes S.L.</p>
+      <p style="margin-top:16px;font-size:10px;color:#888">Generado el ${Utils.formatDate(new Date(), 'datetime')} · Pollos Frescos S.L.</p>
     `, 'Justificante de Pedido');
   },
 

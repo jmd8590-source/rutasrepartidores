@@ -1,6 +1,6 @@
-# Pollos Fuentes — Sistema de Gestión de Pedidos
+﻿# Pollos Frescos — Sistema de Gestión de Pedidos
 
-Sistema de gestión de pedidos y rutas de reparto para **Pollos Fuentes**, empresa dedicada al sacrificio, despiece y distribución de pollos.
+Sistema de gestión de pedidos y rutas de reparto para **Pollos Frescos**, empresa dedicada al sacrificio, despiece y distribución de pollos.
 
 ## 🚀 Despliegue en Cloudflare Pages
 
@@ -45,8 +45,8 @@ node server.js
 
 | Rol | Email | Contraseña |
 |---|---|---|
-| Superadministrador | `admin@pollosfuentes.es` | `Admin1234!` |
-| Repartidor Ruta 1 | `ruta1@pollosfuentes.es` | `Rep1234!` |
+| Superadministrador | `admin@PollosFrescos.es` | `Admin1234!` |
+| Repartidor Ruta 1 | `ruta1@PollosFrescos.es` | `Rep1234!` |
 | Cliente Demo | `cliente1@demo.es` | `Cliente1234!` |
 
 ---

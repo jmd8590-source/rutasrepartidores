@@ -1,12 +1,12 @@
 {
-  "name": "Pollos Fuentes — Gestión de Pedidos",
-  "short_name": "PollosFuentes",
-  "description": "Sistema de gestión de pedidos y reparto para Pollos Fuentes",
+  "name": "Pollos Frescos — Gestión de Pedidos",
+  "short_name": "PollosFrescos",
+  "description": "Sistema de gestión de pedidos y reparto para Pollos Frescos",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#1E293B",
-  "theme_color": "#F97316",
+  "background_color": "#0C4A6E",
+  "theme_color": "#0EA5E9",
   "orientation": "any",
   "lang": "es",
   "icons": [

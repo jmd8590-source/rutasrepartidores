@@ -1,8 +1,8 @@
-// ============================================================
-//  Service Worker — Pollos Fuentes
+﻿// ============================================================
+//  Service Worker — Pollos Frescos
 //  v2 — Compatible con Cloudflare Pages (HTTPS)
 // ============================================================
-const CACHE_NAME = 'pollosfuentes-v2';
+const CACHE_NAME = 'PollosFrescos-v2';
 const ASSETS = [
   '/',
   '/index.html',

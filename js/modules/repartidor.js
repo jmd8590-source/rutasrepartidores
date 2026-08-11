@@ -1,6 +1,6 @@
-// ============================================================
+﻿// ============================================================
 //  REPARTIDOR.js — Módulo del Repartidor/Responsable de Ruta
-//  Pollos Fuentes
+//  Pollos Frescos
 // ============================================================
 'use strict';
 
@@ -274,7 +274,7 @@ const Repartidor = {
   showQRModal(token) {
     const link = Utils.getRegisterLink(token);
     const qrUrl = Utils.getQRCodeURL(link, 220);
-    const waText = encodeURIComponent(`¡Hola! Accede al registro de clientes de Pollos Fuentes mediante este enlace: ${link}`);
+    const waText = encodeURIComponent(`¡Hola! Accede al registro de clientes de Pollos Frescos mediante este enlace: ${link}`);
 
     Modal.show('📱 QR y Enlace de Registro para Cliente', `
       <div style="text-align:center;padding:.5rem 0">
@@ -306,7 +306,7 @@ const Repartidor = {
           <a href="https://wa.me/?text=${waText}" target="_blank" class="btn btn--success btn--sm" style="text-decoration:none">
             💬 Compartir por WhatsApp
           </a>
-          <button class="btn btn--secondary btn--sm" onclick="Utils.printSection('<div style=\\'text-align:center;padding:40px\\'><h1>Pollos Fuentes</h1><h2>Registro de Nuevo Cliente</h2><p>Escanea este código QR con tu móvil para registrarte:</p><img src=\\'${qrUrl}\\' style=\\'width:250px;height:250px;margin:20px 0\\'><p style=\\'font-family:monospace;font-size:24px;font-weight:bold;color:#F97316\\'>${token}</p><p style=\\'font-size:12px;color:#666\\'>Válido por 7 días</p></div>', 'QR Registro')">
+          <button class="btn btn--secondary btn--sm" onclick="Utils.printSection('<div style=\\'text-align:center;padding:40px\\'><h1>Pollos Frescos</h1><h2>Registro de Nuevo Cliente</h2><p>Escanea este código QR con tu móvil para registrarte:</p><img src=\\'${qrUrl}\\' style=\\'width:250px;height:250px;margin:20px 0\\'><p style=\\'font-family:monospace;font-size:24px;font-weight:bold;color:#0EA5E9\\'>${token}</p><p style=\\'font-size:12px;color:#666\\'>Válido por 7 días</p></div>', 'QR Registro')">
             🖨 Imprimir QR
           </button>
         </div>

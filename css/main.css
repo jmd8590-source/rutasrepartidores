@@ -1,5 +1,5 @@
 /* ============================================================
-   MAIN.CSS — Pollos Fuentes
+   MAIN.CSS — Pollos Frescos
    Sistema de diseño completo: variables, reset, layout,
    componentes, auth, dashboard, responsive
    ============================================================ */
@@ -9,28 +9,28 @@
 
 /* ===================== VARIABLES ===================== */
 :root {
-  /* Marca */
-  --primary: #F97316;
-  --primary-dark: #EA580C;
-  --primary-light: #FB923C;
-  --primary-50: #FFF7ED;
-  --primary-100: #FFEDD5;
-  --primary-200: #FED7AA;
+  /* Marca — Azul Celeste Brillante */
+  --primary: #0EA5E9;
+  --primary-dark: #0284C7;
+  --primary-light: #38BDF8;
+  --primary-50: #F0F9FF;
+  --primary-100: #E0F2FE;
+  --primary-200: #BAE6FD;
 
-  /* Slate / Dark */
-  --dark: #0F172A;
-  --dark-700: #1E293B;
-  --dark-600: #334155;
-  --dark-500: #475569;
-  --muted: #64748B;
-  --muted-light: #94A3B8;
+  /* Deep Blue / Dark */
+  --dark: #0C4A6E;
+  --dark-700: #0E5A84;
+  --dark-600: #1474A4;
+  --dark-500: #1E8CB8;
+  --muted: #5B8FA8;
+  --muted-light: #7DD3FC;
 
-  /* Neutros */
-  --bg: #F8FAFC;
-  --bg-alt: #F1F5F9;
+  /* Neutros — Blanco Brillante y Nítido */
+  --bg: #F0F9FF;
+  --bg-alt: #E0F2FE;
   --surface: #FFFFFF;
-  --border: #E2E8F0;
-  --border-light: #F1F5F9;
+  --border: #BAE6FD;
+  --border-light: #E0F2FE;
 
   /* Semánticos */
   --success: #10B981;
@@ -39,18 +39,18 @@
   --warning-bg: #FFFBEB;
   --error: #EF4444;
   --error-bg: #FEF2F2;
-  --info: #3B82F6;
-  --info-bg: #EFF6FF;
-  --accent: #8B5CF6;
-  --accent-bg: #F5F3FF;
+  --info: #0EA5E9;
+  --info-bg: #F0F9FF;
+  --accent: #6366F1;
+  --accent-bg: #EEF2FF;
   --secondary: #06B6D4;
   --secondary-bg: #ECFEFF;
 
-  /* Sidebar */
+  /* Sidebar — Azul Profundo */
   --sidebar-w: 260px;
   --sidebar-w-sm: 68px;
-  --sidebar-bg: #1E293B;
-  --sidebar-active: #F97316;
+  --sidebar-bg: #0C4A6E;
+  --sidebar-active: #38BDF8;
 
   /* Espaciados */
   --space-1: 0.25rem;

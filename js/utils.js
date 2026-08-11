@@ -1,6 +1,6 @@
-// ============================================================
+﻿// ============================================================
 //  UTILS.js — Utilidades globales
-//  Pollos Fuentes
+//  Pollos Frescos
 // ============================================================
 
 'use strict';
@@ -329,15 +329,15 @@ const Utils = {
   },
 
   // Print helper
-  printSection(html, title = 'Pollos Fuentes') {
+  printSection(html, title = 'Pollos Frescos') {
     const w = window.open('', '_blank', 'width=800,height=600');
     w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${title}</title>
     <style>
       body { font-family: Arial, sans-serif; font-size: 12px; color: #000; padding: 20px; }
-      h1 { color: #F97316; font-size: 18px; border-bottom: 2px solid #F97316; padding-bottom: 8px; }
+      h1 { color: #0EA5E9; font-size: 18px; border-bottom: 2px solid #0EA5E9; padding-bottom: 8px; }
       h2 { font-size: 14px; margin-top: 16px; }
       table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-      th { background: #F97316; color: white; padding: 6px 8px; text-align: left; font-size: 11px; }
+      th { background: #0EA5E9; color: white; padding: 6px 8px; text-align: left; font-size: 11px; }
       td { padding: 5px 8px; border-bottom: 1px solid #eee; font-size: 11px; }
       .total { font-weight: bold; font-size: 13px; margin-top: 10px; }
       @media print { body { padding: 0; } }
