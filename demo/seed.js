@@ -13,7 +13,7 @@ window.Seed = {
   },
 
   async init() {
-    if (localStorage.getItem('pf_seed_version') === 'v4') return;
+    if (localStorage.getItem('pf_seed_version') === 'v5') return;
     console.log('🌱 Inicializando datos de demostración...');
 
     // --- Hashes de contraseñas ---
@@ -36,7 +36,7 @@ window.Seed = {
     const users = [
       {
         id: 'user-admin-001', rol: 'superadmin',
-        email: 'admin@PollosFrescos.es',
+        email: 'admin@pollosfrescos.es',
         passwordHash: adminHash, passwordSalt: 'salt-admin-001',
         nombre: 'Administrador', apellidos: 'Principal',
         mfaEnabled: false, mfaSecret: null,
@@ -46,7 +46,7 @@ window.Seed = {
       },
       {
         id: 'user-rep-001', rol: 'repartidor',
-        email: 'ruta1@PollosFrescos.es',
+        email: 'ruta1@pollosfrescos.es',
         passwordHash: rep1Hash, passwordSalt: 'salt-rep-001',
         nombre: 'Carlos', apellidos: 'García Martínez',
         telefono: '611234567', matricula: '1234-ABC', rutaId: 'ruta-001',
@@ -57,7 +57,7 @@ window.Seed = {
       },
       {
         id: 'user-rep-002', rol: 'repartidor',
-        email: 'ruta2@PollosFrescos.es',
+        email: 'ruta2@pollosfrescos.es',
         passwordHash: rep2Hash, passwordSalt: 'salt-rep-002',
         nombre: 'María', apellidos: 'López Sánchez',
         telefono: '622345678', matricula: '5678-DEF', rutaId: 'ruta-002',
@@ -68,7 +68,7 @@ window.Seed = {
       },
       {
         id: 'user-rep-003', rol: 'repartidor',
-        email: 'ruta3@PollosFrescos.es',
+        email: 'ruta3@pollosfrescos.es',
         passwordHash: rep3Hash, passwordSalt: 'salt-rep-003',
         nombre: 'Pedro', apellidos: 'Martínez Ruiz',
         telefono: '633456789', matricula: '9012-GHI', rutaId: 'ruta-003',
@@ -600,7 +600,7 @@ window.Seed = {
       {
         id: 'aud-002', usuarioId: 'user-admin-001', accion: 'CREAR_USUARIO',
         entidad: 'usuario', entidadId: 'user-rep-001',
-        detalles: { email: 'ruta1@PollosFrescos.es', rol: 'repartidor' },
+        detalles: { email: 'ruta1@pollosfrescos.es', rol: 'repartidor' },
         timestamp: '2025-01-05T10:05:00Z'
       },
       {
@@ -615,7 +615,7 @@ window.Seed = {
     // --- INVITACIONES ---
     localStorage.setItem('pf_invitaciones', JSON.stringify([]));
 
-    localStorage.setItem('pf_seed_version', 'v4');
+    localStorage.setItem('pf_seed_version', 'v5');
     console.log('✅ Datos de demostración inicializados');
   },
 

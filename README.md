@@ -45,8 +45,8 @@ node server.js
 
 | Rol | Email | Contraseña |
 |---|---|---|
-| Superadministrador | `admin@PollosFrescos.es` | `Admin1234!` |
-| Repartidor Ruta 1 | `ruta1@PollosFrescos.es` | `Rep1234!` |
+| Superadministrador | `admin@pollosfrescos.es` | `Admin1234!` |
+| Repartidor Ruta 1 | `ruta1@pollosfrescos.es` | `Rep1234!` |
 | Cliente Demo | `cliente1@demo.es` | `Cliente1234!` |
 
 ---
