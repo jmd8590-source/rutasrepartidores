@@ -488,14 +488,39 @@ input[type="checkbox"] { width: auto; accent-color: var(--primary); }
 .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 4px; }
 
 .nav-section-title {
-  font-size: 0.65rem;
-  font-weight: 700;
+  font-size: 0.7rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #475569;
-  padding: var(--space-3) var(--space-4) var(--space-1);
+  letter-spacing: 0.14em;
+  color: #7DD3FC;
+  padding: var(--space-4) var(--space-4) var(--space-2);
   white-space: nowrap;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+}
+.nav-section-title::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 2px;
+  background: linear-gradient(90deg, #38BDF8, #0EA5E9, transparent);
+  border-radius: 2px;
+  animation: navLineShimmer 2.5s ease-in-out infinite;
+}
+.nav-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.25), transparent);
+  margin-left: 4px;
+}
+@keyframes navLineShimmer {
+  0%, 100% { opacity: 0.6; width: 18px; }
+  50% { opacity: 1; width: 24px; }
 }
 .sidebar-collapsed .nav-section-title { opacity: 0; }
 
