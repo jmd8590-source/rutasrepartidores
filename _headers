@@ -1,0 +1,36 @@
+/*
+  # Headers de Seguridad globales para Cloudflare Pages
+  # Pollos Fuentes — SPA PWA
+
+  # IMPORTANTE: Cross-Origin headers necesarios para Web Crypto API (SubtleCrypto)
+  # Sin estos headers, el hash SHA-256 de contraseñas falla en HTTPS.
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
+
+  # Seguridad estándar
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/manifest.json
+  Cache-Control: public, max-age=3600
+
+/css/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/js/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/demo/*
+  Cache-Control: no-cache, no-store, must-revalidate

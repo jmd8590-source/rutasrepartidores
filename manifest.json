@@ -2,7 +2,8 @@
   "name": "Pollos Fuentes — Gestión de Pedidos",
   "short_name": "PollosFuentes",
   "description": "Sistema de gestión de pedidos y reparto para Pollos Fuentes",
-  "start_url": "./index.html",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#1E293B",
   "theme_color": "#F97316",
@@ -10,13 +11,13 @@
   "lang": "es",
   "icons": [
     {
-      "src": "assets/icons/icon-192.png",
+      "src": "/assets/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "assets/icons/icon-512.png",
+      "src": "/assets/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"

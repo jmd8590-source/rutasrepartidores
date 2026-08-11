@@ -1,0 +1,6 @@
+/*
+ * Cloudflare Pages — SPA Redirect Rule
+ * Redirige todas las rutas desconocidas al index.html para que
+ * el router del cliente (js/router.js) maneje la navegación.
+ */
+/* 200 */
