@@ -513,5 +513,27 @@ const App = {
   }
 };
 
+// ── Prevenir zoom accidental por doble toque o gestos en móvil ──
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) {
+    if (!e.target.closest('input:not(.qty-display), textarea, select, [contenteditable="true"]')) {
+      e.preventDefault();
+    }
+  }
+  lastTouchEnd = now;
+}, { passive: false });
+
+document.addEventListener('gesturestart', (e) => {
+  e.preventDefault();
+});
+
+document.addEventListener('dblclick', (e) => {
+  if (!e.target.closest('input:not(.qty-display), textarea, select, [contenteditable="true"]')) {
+    e.preventDefault();
+  }
+});
+
 // ── Inicializar al cargar DOM ──────────────────────────────
 document.addEventListener('DOMContentLoaded', () => App.init());
