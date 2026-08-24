@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Pollos Frescos — Sistema centralizado de gestión de pedidos y reparto">
+  <meta name="theme-color" content="#0EA5E9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Pollos Frescos">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Pollos Frescos — Gestión de Pedidos</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/logo-placeholder.svg">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ========== PANTALLA DE CARGA ========== -->
+  <div id="page-loading" class="page-loading">
+    <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:60px;height:60px">
+      <circle cx="30" cy="30" r="30" fill="#0EA5E9"/>
+      <text x="30" y="40" text-anchor="middle" font-family="Inter,sans-serif" font-size="22" font-weight="800" fill="white">PF</text>
+    </svg>
+    <div class="spinner"></div>
+    <p>Iniciando Pollos Frescos...</p>
+  </div>
+
+  <!-- ========== VISTAS DE AUTENTICACIÓN ========== -->
+  <div id="auth-view" class="auth-view hidden">
+    <div class="auth-bg">
+      <div class="auth-bg-shape auth-bg-shape--1"></div>
+      <div class="auth-bg-shape auth-bg-shape--2"></div>
+      <div class="auth-bg-shape auth-bg-shape--3"></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="auth-login" class="auth-container">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div class="logo-placeholder">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="40" cy="40" r="40" fill="#0EA5E9"/>
+              <text x="40" y="52" text-anchor="middle" font-family="Inter,sans-serif" font-size="28" font-weight="800" fill="white">PF</text>
+            </svg>
+          </div>
+          <div class="auth-brand">
+            <h1>Pollos Frescos</h1>
+            <p>Gestión de pedidos y reparto</p>
+          </div>
+        </div>
+
+        <form id="login-form" class="auth-form" novalidate autocomplete="on">
+          <h2>Iniciar Sesión</h2>
+          <p class="auth-subtitle" style="margin-bottom:1.25rem">Accede con tu cuenta de usuario</p>
+
+          <div class="form-group">
+            <label for="login-email">Correo electrónico</label>
+            <div class="input-wrapper">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="login-email" name="email" placeholder="correo@ejemplo.com"
+                     autocomplete="email" required>
+            </div>
+            <span class="field-error" id="login-email-err"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="login-password">Contraseña</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="login-password" name="password" placeholder="••••••••"
+                     autocomplete="current-password" required>
+              <button type="button" class="toggle-password" data-target="login-password" tabindex="-1">👁</button>
+            </div>
+            <span class="field-error" id="login-pass-err"></span>
+          </div>
+
+          <div class="form-group" id="mfa-group" style="display:none">
+            <label for="login-mfa">Código de verificación (MFA)</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔑</span>
+              <input type="text" id="login-mfa" name="mfa" placeholder="123456" maxlength="6"
+                     inputmode="numeric" autocomplete="one-time-code">
+            </div>
+            <span class="field-error" id="login-mfa-err"></span>
+            <span class="form-hint">Introduce el código de 6 dígitos de tu aplicación de autenticación</span>
+          </div>
+
+          <div id="login-error" class="alert alert--error" style="display:none"></div>
+
+          <button type="submit" class="btn btn--primary btn--full btn--lg" id="login-submit">
+            <span class="btn-text">Entrar</span>
+            <span class="btn-loader hidden">⟳</span>
+          </button>
+
+          <div class="auth-links">
+            <button type="button" class="link-btn" id="goto-forgot">¿Olvidaste tu contraseña?</button>
+            <button type="button" class="link-btn" id="goto-register">Registrarse con código</button>
+          </div>
+        </form>
+
+        <div class="demo-credentials">
+          <p>🎯 Credenciales de demostración:</p>
+          <div class="demo-grid">
+            <button class="demo-btn" data-email="admin@pollosfrescos.es" data-pass="Admin1234!">👑 Superadmin</button>
+            <button class="demo-btn" data-email="ruta1@pollosfrescos.es" data-pass="Ruta1234!">🚚 Repartidor</button>
+            <button class="demo-btn" data-email="cliente1@demo.es" data-pass="Cliente1234!">🏪 Cliente</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTRO -->
+    <div id="auth-register" class="auth-container hidden">
+      <div class="auth-card" style="max-width:560px">
+        <div class="auth-logo small">
+          <div class="logo-placeholder small">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="40" cy="40" r="40" fill="#0EA5E9"/>
+              <text x="40" y="52" text-anchor="middle" font-family="Inter,sans-serif" font-size="28" font-weight="800" fill="white">PF</text>
+            </svg>
+          </div>
+          <div class="auth-brand"><h1>Pollos Frescos</h1><p>Registro de Cliente</p></div>
+        </div>
+
+        <form id="register-form" class="auth-form" novalidate>
+          <h2>Crear Cuenta</h2>
+          <p class="auth-subtitle">Introduce el código de invitación de tu repartidor</p>
+
+          <div class="form-group">
+            <label for="reg-token">Código de Invitación *</label>
+            <div class="input-wrapper" style="display:flex;gap:.5rem">
+              <input type="text" id="reg-token" name="token" placeholder="INV-XXXXXXXX"
+                     style="flex:1;text-transform:uppercase" required>
+              <button type="button" id="verify-token-btn" class="btn btn--primary">Verificar</button>
+            </div>
+            <span class="field-error" id="reg-token-err"></span>
+          </div>
+
+          <div id="register-fields" class="hidden">
+            <div id="invite-info" class="alert alert--success" style="margin-bottom:1rem"></div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-negocio">Nombre del Negocio *</label>
+                <input type="text" id="reg-negocio" name="nombreNegocio" placeholder="Carnicería López" required>
+                <span class="field-error" id="reg-negocio-err"></span>
+              </div>
+              <div class="form-group">
+                <label for="reg-contacto">Persona de Contacto *</label>
+                <input type="text" id="reg-contacto" name="personaContacto" placeholder="Juan López" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-nif">NIF/CIF *</label>
+                <input type="text" id="reg-nif" name="nifCif" placeholder="B12345678" required>
+                <span class="field-error" id="reg-nif-err"></span>
+              </div>
+              <div class="form-group">
+                <label for="reg-tel">Teléfono *</label>
+                <input type="tel" id="reg-tel" name="telefono" placeholder="612345678" required>
+                <span class="field-error" id="reg-tel-err"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-dir">Dirección *</label>
+              <input type="text" id="reg-dir" name="direccion" placeholder="Calle Mayor, 1" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-loc">Localidad *</label>
+                <input type="text" id="reg-loc" name="localidad" placeholder="Madrid" required>
+              </div>
+              <div class="form-group">
+                <label for="reg-cp">Código Postal *</label>
+                <input type="text" id="reg-cp" name="codigoPostal" placeholder="28001" maxlength="5" required>
+                <span class="field-error" id="reg-cp-err"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-email">Email de acceso *</label>
+              <input type="email" id="reg-email" name="email" placeholder="negocio@email.com" required>
+              <span class="field-error" id="reg-email-err"></span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-pass">Contraseña *</label>
+                <div class="input-wrapper">
+                  <input type="password" id="reg-pass" name="password" placeholder="Mín. 8 caracteres" required>
+                  <button type="button" class="toggle-password" data-target="reg-pass">👁</button>
+                </div>
+                <span class="field-error" id="reg-pass-err"></span>
+              </div>
+              <div class="form-group">
+                <label for="reg-pass2">Confirmar Contraseña *</label>
+                <div class="input-wrapper">
+                  <input type="password" id="reg-pass2" name="password2" placeholder="Repite la contraseña" required>
+                  <button type="button" class="toggle-password" data-target="reg-pass2">👁</button>
+                </div>
+                <span class="field-error" id="reg-pass2-err"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-obs">Observaciones de entrega</label>
+              <textarea id="reg-obs" name="observacionesEntrega" placeholder="Horario preferido, acceso al local..."></textarea>
+            </div>
+
+            <div class="rgpd-consent">
+              <div class="checkbox-group">
+                <input type="checkbox" id="rgpd-check" name="rgpdConsent" required>
+                <label for="rgpd-check">
+                  He leído y acepto la <button type="button" class="link-btn" id="open-privacy-reg">Política de Privacidad</button>
+                  y el tratamiento de mis datos personales conforme al RGPD. *
+                </label>
+              </div>
+              <span class="field-error" id="reg-rgpd-err"></span>
+            </div>
+
+            <div id="register-error" class="alert alert--error" style="display:none"></div>
+
+            <button type="submit" class="btn btn--primary btn--full btn--lg" id="register-submit">
+              Crear Cuenta
+            </button>
+          </div>
+        </form>
+
+        <div class="auth-links" style="margin-top:1rem;text-align:center">
+          <button type="button" class="link-btn" id="goto-login-reg">← Volver al inicio de sesión</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECUPERAR CONTRASEÑA -->
+    <div id="auth-forgot" class="auth-container hidden">
+      <div class="auth-card">
+        <div class="auth-logo small">
+          <div class="logo-placeholder small">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="40" cy="40" r="40" fill="#0EA5E9"/>
+              <text x="40" y="52" text-anchor="middle" font-family="Inter,sans-serif" font-size="28" font-weight="800" fill="white">PF</text>
+            </svg>
+          </div>
+          <div class="auth-brand"><h1>Pollos Frescos</h1></div>
+        </div>
+
+        <form id="forgot-form" class="auth-form">
+          <h2>Recuperar Contraseña</h2>
+          <p class="auth-subtitle">Introduce tu email y te enviaremos instrucciones para restablecer tu contraseña.</p>
+
+          <div class="form-group">
+            <label for="forgot-email">Correo electrónico</label>
+            <div class="input-wrapper">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="forgot-email" name="email" placeholder="correo@ejemplo.com" required>
+            </div>
+          </div>
+
+          <div id="forgot-success" class="alert alert--success" style="display:none">
+            📧 Si el email existe en el sistema, recibirás un enlace en breve. <br>
+            <small>Para demo: La nueva contraseña es <strong>NuevaPass1!</strong></small>
+          </div>
+
+          <button type="submit" class="btn btn--primary btn--full">Enviar Instrucciones</button>
+
+          <div class="auth-links" style="text-align:center;margin-top:1rem">
+            <button type="button" class="link-btn" id="goto-login-forgot">← Volver al inicio de sesión</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- POLÍTICA DE PRIVACIDAD -->
+    <div id="auth-privacy" class="auth-container hidden" style="max-width:680px">
+      <div class="auth-card">
+        <h2 style="margin-bottom:1rem">📋 Política de Privacidad</h2>
+        <div class="privacy-content">
+          <p><strong>Responsable del Tratamiento:</strong> Pollos Frescos S.L. — CIF: B00000001</p>
+          <p><strong>Finalidad:</strong> Gestión de pedidos, relación comercial con clientes, logística de reparto y comunicaciones relacionadas con el servicio.</p>
+          <p><strong>Legitimación:</strong> Ejecución de contrato (Art. 6.1.b RGPD) y consentimiento del interesado (Art. 6.1.a RGPD).</p>
+          <p><strong>Destinatarios:</strong> Los datos no se cederán a terceros salvo obligación legal o prestadores de servicios necesarios para la actividad (transportistas, plataformas tecnológicas bajo acuerdo de confidencialidad).</p>
+          <p><strong>Plazo de conservación:</strong> Mientras dure la relación comercial y el tiempo legalmente exigido (mínimo 5 años para datos contables).</p>
+          <p><strong>Derechos:</strong> Puede ejercer sus derechos de acceso, rectificación, supresión, limitación, portabilidad y oposición dirigiéndose a: <em>privacidad@pollosfrescos.es</em></p>
+          <p><strong>Derecho de reclamación:</strong> Si considera que el tratamiento no es conforme puede presentar reclamación ante la Agencia Española de Protección de Datos (www.aepd.es).</p>
+          <p><strong>Transferencias internacionales:</strong> No se realizan transferencias a países fuera del Espacio Económico Europeo.</p>
+        </div>
+        <div style="display:flex;gap:.75rem;margin-top:1.5rem">
+          <button type="button" class="btn btn--primary" id="accept-privacy">✅ Acepto la Política de Privacidad</button>
+          <button type="button" class="btn btn--outline" id="close-privacy">← Volver</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /auth-view -->
+
+  <!-- ========== APLICACIÓN PRINCIPAL ========== -->
+  <div id="app-view" class="app-layout hidden">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Alternar menú" title="Menú">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="sidebar-logo">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-icon">
+            <circle cx="20" cy="20" r="20" fill="#0EA5E9"/>
+            <text x="20" y="26" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="800" fill="white">PF</text>
+          </svg>
+          <span class="sidebar-brand">Pollos Frescos</span>
+        </div>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="nav-avatar">U</div>
+        <div class="user-info">
+          <div class="user-name" id="nav-name">Usuario</div>
+          <div class="user-role" id="nav-role">Rol</div>
+        </div>
+        <div class="user-notifications">
+          <button class="notif-btn" id="notif-bell" title="Notificaciones" aria-label="Notificaciones">
+            🔔<span class="notif-badge hidden" id="notif-count">0</span>
+          </button>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebar-nav" aria-label="Navegación principal">
+        <!-- Generado por App.buildNav() -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn--ghost btn--sm btn--full sidebar-logout" id="logout-btn">
+          🚪 <span class="logout-label">Cerrar Sesión</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Overlay móvil -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+      <div class="content-header">
+        <div class="content-header-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Abrir menú">☰</button>
+          <div>
+            <h2 id="page-title">Dashboard</h2>
+            <p id="page-subtitle" class="page-subtitle"></p>
+          </div>
+        </div>
+        <div class="content-header-right">
+          <div class="header-actions" id="header-actions"></div>
+          <button class="mobile-logout-btn" id="mobile-logout-btn" aria-label="Cerrar sesión" title="Cerrar sesión">
+            <span class="mobile-logout-icon">🚪</span>
+            <span class="mobile-logout-text">Salir</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="content-body" id="main-content">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Cargando...</p>
+        </div>
+      </div>
+    </main>
+
+  </div><!-- /app-view -->
+
+  <!-- ========== MODAL ========== -->
+  <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal" id="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-title">Modal</h3>
+        <button class="modal-close" id="modal-close" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- ========== NOTIFICACIONES PANEL ========== -->
+  <div id="notif-panel" class="notif-panel hidden" role="region" aria-label="Notificaciones">
+    <div class="notif-panel-header">
+      <h4>🔔 Notificaciones</h4>
+      <button id="mark-all-read" class="link-btn" style="font-size:.8rem">Marcar leídas</button>
+    </div>
+    <div id="notif-list" class="notif-list">
+      <div class="empty-state-sm">Cargando...</div>
+    </div>
+  </div>
+
+  <!-- ========== TOAST ========== -->
+  <div id="toast-container" class="toast-container" role="region" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- ========== CARRITO ========== -->
+  <div id="cart-panel" class="cart-panel hidden" aria-label="Carrito de pedido">
+    <div class="cart-panel-header">
+      <h4>🛒 Mi Pedido</h4>
+      <button id="close-cart" class="modal-close" aria-label="Cerrar carrito">✕</button>
+    </div>
+    <div id="cart-items" class="cart-items">
+      <div class="empty-state">
+        <div class="empty-icon">🛒</div>
+        <p>El carrito está vacío</p>
+        <p style="font-size:.8rem;margin-top:.5rem">Añade productos del catálogo</p>
+      </div>
+    </div>
+    <div class="cart-footer" id="cart-footer" style="display:none">
+      <div class="cart-total">
+        <span>Total estimado:</span>
+        <strong id="cart-total-amount">0,00 €</strong>
+      </div>
+      <textarea id="cart-obs" class="cart-obs" placeholder="Observaciones del pedido (opcional)..." rows="2"></textarea>
+      <button class="btn btn--primary btn--full" id="cart-checkout">Revisar y Confirmar →</button>
+    </div>
+  </div>
+  <div id="cart-overlay" class="cart-overlay hidden"></div>
+
+</div><!-- /app -->
+
+<!-- Librerías externas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<!-- Módulos de la app (orden de carga: dependencias primero) -->
+<script src="demo/seed.js"></script>
+<script src="js/db.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/audit.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/modules/superadmin.js"></script>
+<script src="js/modules/repartidor.js"></script>
+<script src="js/modules/cliente.js"></script>
+<script src="js/router.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

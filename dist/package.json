@@ -1,0 +1,23 @@
+{
+  "name": "pollos-frescos-rutas",
+  "version": "2.0.0",
+  "description": "Sistema de gestión y reparto de pedidos para distribución cárnica",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build:protect": "node scripts/obfuscate.js",
+    "build": "node scripts/build.js"
+  },
+  "keywords": [
+    "reparto",
+    "pedidos",
+    "pollos",
+    "rutas",
+    "distribucion"
+  ],
+  "author": "Pollos Frescos",
+  "license": "Proprietary",
+  "devDependencies": {
+    "javascript-obfuscator": "^4.1.1"
+  }
+}
