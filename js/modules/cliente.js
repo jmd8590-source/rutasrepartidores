@@ -265,18 +265,16 @@ const Cliente = {
                       <div class="product-price">
                         ${Utils.formatCurrency(p.dispPrecio)} <span>/ ${Utils.esc(p.unidadVenta)}</span>
                       </div>
-                      ${abierto && (!todayPedido || isEditable) ? `
-                        ${inCart ? `
-                          <div class="cart-item-qty">
-                            <button class="qty-btn" onclick="Cliente.changeCartQty('${p.id}',-1)">−</button>
-                            <span class="qty-display" id="qty-${p.id}">${inCart.cantidad}</span>
-                            <button class="qty-btn" onclick="Cliente.changeCartQty('${p.id}',1)">+</button>
-                          </div>
-                        ` : `
-                          <button class="product-add-btn" onclick="Cliente.addToCart('${p.id}',${p.dispPrecio},'${Utils.esc(p.nombre).replace(/'/g,"\\'")}','${Utils.esc(p.unidadVenta)}',${p.dispLimite||'null'})"
-                                  title="Añadir al pedido">+</button>
-                        `}
-                      ` : `<span class="badge badge--default">No disponible</span>`}
+                      ${inCart ? `
+                        <div class="cart-item-qty">
+                          <button class="qty-btn" onclick="Cliente.changeCartQty('${p.id}',-1)">−</button>
+                          <span class="qty-display" id="qty-${p.id}">${inCart.cantidad}</span>
+                          <button class="qty-btn" onclick="Cliente.changeCartQty('${p.id}',1)">+</button>
+                        </div>
+                      ` : `
+                        <button class="product-add-btn" onclick="Cliente.addToCart('${p.id}',${p.dispPrecio},'${Utils.esc(p.nombre).replace(/'/g,"\\'")}','${Utils.esc(p.unidadVenta)}',${p.dispLimite||'null'})"
+                                title="Añadir al pedido">+</button>
+                      `}
                     </div>
                   </div>`;
                 }).join('')}

@@ -13,7 +13,7 @@ window.Seed = {
   },
 
   async init() {
-    if (localStorage.getItem('pf_seed_version') === 'v6') return;
+    if (localStorage.getItem('pf_seed_version') === 'v7') return;
     console.log('🌱 Inicializando datos de demostración...');
 
     // --- Hashes de contraseñas ---
@@ -615,7 +615,7 @@ window.Seed = {
     // --- INVITACIONES ---
     localStorage.setItem('pf_invitaciones', JSON.stringify([]));
 
-    localStorage.setItem('pf_seed_version', 'v6');
+    localStorage.setItem('pf_seed_version', 'v7');
     console.log('✅ Datos de demostración inicializados');
   },
 
