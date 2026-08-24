@@ -48,7 +48,7 @@ const Cliente = {
 
     const ruta = DB.findById('rutas', cli.rutaId);
     const pedidos = DB.find('pedidos', p => p.clienteId === cli.id);
-    const todayPedido = pedidos.find(p => p.fecha === today);
+    const todayPedidos = pedidos.filter(p => p.fecha === today).sort((a, b) => b.creadoEn.localeCompare(a.creadoEn));
     const ultimosPedidos = [...pedidos].sort((a, b) => b.creadoEn.localeCompare(a.creadoEn)).slice(0, 5);
 
     // Verificar hora límite
@@ -62,58 +62,77 @@ const Cliente = {
     return `
       ${!abierto ? `
         <div class="alert alert--warning mb-4">
-          ⏰ El plazo para realizar pedidos hoy (<strong>${ruta?.horaLimitePedido}</strong>) ha finalizado.
+          ⏰ El plazo para realizar pedidos hoy (<strong>${ruta?.horaLimitePedido || '19:00'}</strong>) ha finalizado.
           Puedes realizar tu pedido para mañana.
         </div>` : `
         <div class="alert alert--success mb-4">
-          ✅ Pedidos abiertos hasta las <strong>${ruta?.horaLimitePedido || '—'}</strong>
+          ✅ Pedidos abiertos hasta las <strong>${ruta?.horaLimitePedido || '19:00'}</strong>
           <span style="margin-left:.75rem">
             <button class="btn btn--primary btn--sm" onclick="Router.go('/cliente/catalogo')">🛒 Hacer Pedido Ahora</button>
           </span>
         </div>`
       }
 
-      ${todayPedido ? `
+      ${todayPedidos.length ? `
       <div class="card mb-5" style="border:2px solid var(--primary)">
         <div class="card-header" style="background:var(--primary-50)">
           <div>
-            <h3 style="color:var(--primary-dark)">📦 Tu Pedido de Hoy</h3>
-            <p style="font-size:.875rem;color:var(--muted)">${Utils.formatDate(todayPedido.creadoEn, 'datetime')}</p>
+            <h3 style="color:var(--primary-dark)">📦 Tus Pedidos de Hoy (${todayPedidos.length})</h3>
+            <p style="font-size:.875rem;color:var(--muted)">Puedes realizar tantos pedidos como necesites hoy</p>
           </div>
-          <div style="text-align:right">
-            ${Utils.statusBadge(todayPedido.estado)}
-            <div style="font-size:1.3rem;font-weight:800;color:var(--primary);margin-top:.25rem">${Utils.formatCurrency(todayPedido.total)}</div>
+          <div>
+            <button class="btn btn--primary btn--sm" onclick="Router.go('/cliente/catalogo')">➕ Hacer Otro Pedido</button>
           </div>
         </div>
         <div class="card-body">
-          <!-- Progress steps -->
-          <div class="status-steps">
-            ${['pendiente','confirmado','en_preparacion','preparado','en_reparto','entregado'].map(e => {
-              const estados = ['pendiente','confirmado','en_preparacion','preparado','en_reparto','entregado'];
-              const currentIdx = estados.indexOf(todayPedido.estado);
-              const thisIdx = estados.indexOf(e);
-              const icons = { pendiente: '🕐', confirmado: '✅', en_preparacion: '🔧', preparado: '📦', en_reparto: '🚚', entregado: '🏠' };
-              return `<div class="status-step ${thisIdx < currentIdx ? 'done' : thisIdx === currentIdx ? 'current' : ''}">
-                <div class="step-dot">${thisIdx <= currentIdx ? (thisIdx < currentIdx ? '✓' : icons[e]) : ''}</div>
-                <div class="step-label">${e.replace('_', ' ')}</div>
-              </div>`;
-            }).join('')}
-          </div>
-          ${todayPedido.observaciones ? `<div class="alert alert--info mt-3">💬 ${Utils.esc(todayPedido.observaciones)}</div>` : ''}
-          <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap">
-            <button class="btn btn--outline btn--sm" onclick="Cliente.showPedidoDetalle('${todayPedido.id}')">👁 Ver Detalle</button>
-            <button class="btn btn--secondary btn--sm" onclick="Cliente.printPedido('${todayPedido.id}')">🖨 Justificante</button>
-            ${(todayPedido.estado === 'pendiente') && abierto ? `
-              <button class="btn btn--error btn--sm" onclick="Cliente.cancelarPedido('${todayPedido.id}')">❌ Cancelar</button>` : ''}
-          </div>
+          ${todayPedidos.map((tp, idx) => `
+            <div style="padding:1rem 0;${idx > 0 ? 'border-top:1.5px dashed var(--border);margin-top:1rem;' : ''}">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem">
+                <div>
+                  <span style="font-weight:700;font-size:1rem;color:var(--dark-700)">Pedido #${tp.id.slice(-6).toUpperCase()}</span>
+                  <span style="font-size:.8rem;color:var(--muted);margin-left:.5rem">🕒 ${Utils.formatDate(tp.creadoEn, 'time')}</span>
+                </div>
+                <div style="text-align:right">
+                  ${Utils.statusBadge(tp.estado)}
+                  <span style="font-size:1.15rem;font-weight:800;color:var(--primary);margin-left:.5rem">${Utils.formatCurrency(tp.total)}</span>
+                </div>
+              </div>
+
+              <!-- Progress steps -->
+              <div class="status-steps">
+                ${['pendiente','confirmado','en_preparacion','preparado','en_reparto','entregado'].map(e => {
+                  const estados = ['pendiente','confirmado','en_preparacion','preparado','en_reparto','entregado'];
+                  const currentIdx = estados.indexOf(tp.estado);
+                  const thisIdx = estados.indexOf(e);
+                  const icons = { pendiente: '🕐', confirmado: '✅', en_preparacion: '🔧', preparado: '📦', en_reparto: '🚚', entregado: '🏠' };
+                  return `<div class="status-step ${thisIdx < currentIdx ? 'done' : thisIdx === currentIdx ? 'current' : ''}">
+                    <div class="step-dot">${thisIdx <= currentIdx ? (thisIdx < currentIdx ? '✓' : icons[e]) : ''}</div>
+                    <div class="step-label">${e.replace('_', ' ')}</div>
+                  </div>`;
+                }).join('')}
+              </div>
+
+              <div style="font-size:.85rem;color:var(--dark-600);margin-top:.5rem">
+                ${(tp.lineas || []).map(l => `${Utils.formatNumber(l.cantidad, 0)} ${Utils.esc(l.unidadVenta || '')} × ${Utils.esc(l.nombre || '')}`).join(' · ')}
+              </div>
+              ${tp.observaciones ? `<div class="alert alert--info mt-2" style="font-size:.8rem;padding:.35rem .6rem">💬 ${Utils.esc(tp.observaciones)}</div>` : ''}
+
+              <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap">
+                <button class="btn btn--outline btn--xs" onclick="Cliente.showPedidoDetalle('${tp.id}')">👁 Ver Detalle</button>
+                <button class="btn btn--secondary btn--xs" onclick="Cliente.printPedido('${tp.id}')">🖨 Justificante</button>
+                ${(tp.estado === 'pendiente') ? `
+                  <button class="btn btn--error btn--xs" onclick="Cliente.cancelarPedido('${tp.id}')">❌ Cancelar</button>` : ''}
+              </div>
+            </div>
+          `).join('')}
         </div>
       </div>` : `
       <div class="card mb-5" style="border:2px dashed var(--border)">
         <div class="card-body" style="text-align:center;padding:2rem">
           <div style="font-size:3rem;margin-bottom:.75rem">🛒</div>
-          <h3 style="margin-bottom:.5rem">Sin pedido hoy</h3>
+          <h3 style="margin-bottom:.5rem">Sin pedidos hoy</h3>
           <p style="color:var(--muted);margin-bottom:1rem">Todavía no has realizado ningún pedido hoy.</p>
-          ${abierto ? `<button class="btn btn--primary" onclick="Router.go('/cliente/catalogo')">Ver Catálogo de Hoy</button>` : '<p style="color:var(--muted);font-size:.875rem">El plazo de pedidos ha cerrado por hoy.</p>'}
+          <button class="btn btn--primary" onclick="Router.go('/cliente/catalogo')">Ver Catálogo y Hacer Pedido</button>
         </div>
       </div>`}
 
@@ -170,10 +189,6 @@ const Cliente = {
       return now < lim;
     })();
 
-    // Pedido de hoy ya existente
-    const todayPedido = DB.findOne('pedidos', p => p.clienteId === cli.id && p.fecha === today);
-    const isEditable = todayPedido && todayPedido.estado === 'pendiente' && abierto;
-
     const productos = DB.find('productos', p => p.activo !== false);
     const categorias = DB.get('categorias');
 
@@ -215,13 +230,6 @@ const Cliente = {
       ${!abierto ? `
         <div class="alert alert--warning mb-4">
           ⏰ El plazo de pedidos cerró a las <strong>${ruta?.horaLimitePedido || '19:00'}</strong>. No puedes realizar ni modificar pedidos.
-        </div>` : ''}
-
-      ${todayPedido && !isEditable ? `
-        <div class="alert alert--info mb-4">
-          ℹ️ Ya tienes un pedido para hoy (${Utils.statusBadge(todayPedido.estado)}). 
-          ${isEditable ? 'Puedes modificarlo desde tu carrito.' : 'No puedes modificarlo en este estado.'}
-          <button class="btn btn--outline btn--sm" style="margin-left:.5rem" onclick="Cliente.showPedidoDetalle('${todayPedido.id}')">Ver Pedido</button>
         </div>` : ''}
 
       <div class="filters-bar mb-4" style="background:transparent;border:none;padding:0">
@@ -473,45 +481,31 @@ const Cliente = {
     const cli = this._getClienteProfile();
     if (!cli || !this._cart.length) return;
     const today = Utils.today();
-
-    // Verificar pedido ya existente
-    const existing = DB.findOne('pedidos', p => p.clienteId === cli.id && p.fecha === today);
-    if (existing && existing.estado !== 'pendiente') {
-      Toast.error('Ya tienes un pedido en proceso para hoy que no se puede modificar.');
-      Modal.hide();
-      return;
-    }
-
     const session = this._getSession();
     const lineas = this._cart.map(item => ({ ...item }));
     const total = parseFloat(lineas.reduce((s, l) => s + l.subtotal, 0).toFixed(2));
 
-    if (existing) {
-      // Actualizar pedido pendiente
-      DB.update('pedidos', existing.id, { lineas, total, observaciones: this._cartObs });
-      Audit.log('CAMBIAR_ESTADO_PEDIDO', 'pedido', existing.id, { accion: 'modificado por cliente' });
-      Toast.success('Pedido modificado correctamente');
-    } else {
-      // Nuevo pedido
-      const pedido = DB.insert('pedidos', {
-        clienteId: cli.id,
-        rutaId: cli.rutaId,
-        fecha: today,
-        estado: 'pendiente',
-        lineas,
-        observaciones: this._cartObs,
-        total,
-        historialEstados: [{ estado: 'pendiente', fecha: Utils.now(), usuario: session?.userId }]
-      });
-      // Notificar al repartidor
-      const ruta = DB.findById('rutas', cli.rutaId);
-      if (ruta?.repartidorId) {
-        Notify.add(ruta.repartidorId, 'Nuevo Pedido Recibido',
-          `${cli.nombreNegocio} ha realizado un nuevo pedido por ${Utils.formatCurrency(total)}`, 'info', pedido.id);
-      }
-      Audit.log('CREAR_PEDIDO', 'pedido', pedido.id, { clienteId: cli.id, total });
-      Toast.success('¡Pedido realizado correctamente!');
+    // Nuevo pedido independiente (el cliente puede realizar tantos pedidos como desee en el mismo día)
+    const pedido = DB.insert('pedidos', {
+      clienteId: cli.id,
+      rutaId: cli.rutaId,
+      fecha: today,
+      estado: 'pendiente',
+      lineas,
+      observaciones: this._cartObs,
+      total,
+      historialEstados: [{ estado: 'pendiente', fecha: Utils.now(), usuario: session?.userId }]
+    });
+
+    // Notificar al repartidor
+    const ruta = DB.findById('rutas', cli.rutaId);
+    if (ruta?.repartidorId) {
+      Notify.add(ruta.repartidorId, 'Nuevo Pedido Recibido',
+        `${cli.nombreNegocio} ha realizado un nuevo pedido (${Utils.formatCurrency(total)})`, 'info', pedido.id);
     }
+
+    Audit.log('CREAR_PEDIDO', 'pedido', pedido.id, { clienteId: cli.id, total });
+    Toast.success('¡Pedido realizado correctamente!');
 
     this.clearCart();
     Modal.hide();
