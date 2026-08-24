@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 //  REPARTIDOR.js — Módulo del Repartidor/Responsable de Ruta
 //  Pollos Frescos
 // ============================================================
@@ -253,7 +253,7 @@ const Repartidor = {
                 </div>
                 <div style="display:flex;gap:.35rem">
                   <button class="btn btn--primary btn--xs" onclick="Repartidor.showQRModal('${Utils.esc(i.token)}')">📲 QR / Enlace</button>
-                  <button class="btn btn--outline btn--xs" onclick="navigator.clipboard.writeText('${Utils.esc(Utils.getRegisterLink(i.token))}').then(()=>Toast.success('Enlace copiado'))">📋 Copiar Enlace</button>
+                  <button class="btn btn--outline btn--xs" onclick="Utils.copyToClipboard('${Utils.esc(Utils.getRegisterLink(i.token))}', 'Enlace de registro copiado')">📋 Copiar Enlace</button>
                 </div>
               </div>
             `).join('');
@@ -273,40 +273,45 @@ const Repartidor = {
 
   showQRModal(token) {
     const link = Utils.getRegisterLink(token);
-    const qrUrl = Utils.getQRCodeURL(link, 220);
+    const qrUrl = Utils.getQRCodeURL(link, 240);
     const waText = encodeURIComponent(`¡Hola! Accede al registro de clientes de Pollos Frescos mediante este enlace: ${link}`);
 
     Modal.show('📱 QR y Enlace de Registro para Cliente', `
-      <div style="text-align:center;padding:.5rem 0">
-        <div style="font-size:.875rem;color:var(--muted);margin-bottom:1rem">
-          Escanea el código QR con la cámara del móvil para acceder directamente al registro:
-        </div>
+      <div style="text-align:center;padding:.25rem 0">
+        <p style="font-size:.875rem;color:var(--muted);margin-bottom:1rem;line-height:1.4">
+          Escanea el código QR con la cámara del móvil o comparte el enlace directo para registrar un nuevo cliente:
+        </p>
 
         <!-- Código QR -->
-        <div style="background:#fff;padding:1rem;display:inline-block;border-radius:var(--radius-md);box-shadow:0 2px 10px rgba(0,0,0,0.1);margin-bottom:1rem;border:1px solid var(--border)">
-          <img src="${qrUrl}" alt="QR Registro" style="width:200px;height:200px;display:block">
+        <div style="background:#fff;padding:.875rem;display:inline-flex;flex-direction:column;align-items:center;border-radius:var(--radius-md);box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:1rem;border:1px solid var(--border);max-width:100%">
+          <img src="${qrUrl}" alt="QR Registro" style="width:190px;height:190px;max-width:100%;display:block;border-radius:4px"
+               onerror="this.parentElement.innerHTML='<div style=\\'padding:2rem 1rem;color:var(--muted);font-size:.85rem\\'>QR disponible mediante el enlace inferior</div>'">
+          <span style="font-size:.75rem;color:var(--muted);margin-top:.5rem">Válido durante 7 días</span>
         </div>
 
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:.25rem">Código de invitación:</div>
-        <div style="font-family:monospace;font-size:1.5rem;font-weight:800;color:var(--primary);letter-spacing:.1em;margin-bottom:1rem">
-          ${Utils.esc(token)}
+        <div style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:1rem">
+          <span style="font-family:monospace;font-size:1.4rem;font-weight:800;color:var(--primary);letter-spacing:.08em;background:var(--primary-50);padding:4px 12px;border-radius:var(--radius-sm);border:1px dashed var(--primary)">
+            ${Utils.esc(token)}
+          </span>
+          <button class="btn btn--outline btn--xs" onclick="Utils.copyToClipboard('${Utils.esc(token)}', 'Código copiado')" title="Copiar código">📋</button>
         </div>
 
         <!-- Enlace web -->
         <div class="form-group mb-3 text-left">
           <label style="font-size:.8rem;font-weight:600">Enlace directo de registro:</label>
-          <div style="display:flex;gap:.5rem">
-            <input type="text" value="${Utils.esc(link)}" readonly style="font-size:.8rem;background:var(--bg)">
-            <button class="btn btn--outline btn--sm" onclick="navigator.clipboard.writeText('${Utils.esc(link)}').then(()=>Toast.success('Enlace copiado'))">📋 Copiar</button>
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <input type="text" value="${Utils.esc(link)}" readonly style="font-size:.8rem;background:var(--bg);flex:1;min-width:0" id="qr-modal-link">
+            <button class="btn btn--primary btn--sm" style="flex-shrink:0" onclick="Utils.copyToClipboard('${Utils.esc(link)}', 'Enlace de registro copiado')">📋 Copiar</button>
           </div>
         </div>
 
         <!-- Acciones de compartir -->
         <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:1.25rem">
-          <a href="https://wa.me/?text=${waText}" target="_blank" class="btn btn--success btn--sm" style="text-decoration:none">
-            💬 Compartir por WhatsApp
-          </a>
-          <button class="btn btn--secondary btn--sm" onclick="Utils.printSection('<div style=\\'text-align:center;padding:40px\\'><h1>Pollos Frescos</h1><h2>Registro de Nuevo Cliente</h2><p>Escanea este código QR con tu móvil para registrarte:</p><img src=\\'${qrUrl}\\' style=\\'width:250px;height:250px;margin:20px 0\\'><p style=\\'font-family:monospace;font-size:24px;font-weight:bold;color:#0EA5E9\\'>${token}</p><p style=\\'font-size:12px;color:#666\\'>Válido por 7 días</p></div>', 'QR Registro')">
+          <button class="btn btn--success btn--sm" onclick="Utils.shareInvitation('${Utils.esc(token)}', '${Utils.esc(link)}')">
+            📲 Compartir (WhatsApp / Móvil)
+          </button>
+          <button class="btn btn--secondary btn--sm" onclick="Utils.printSection('<div style=\\'text-align:center;padding:40px;font-family:sans-serif\\'><h1>Pollos Frescos</h1><h2>Registro de Nuevo Cliente</h2><p>Escanea este código QR con tu móvil para registrarte:</p><img src=\\'${qrUrl}\\' style=\\'width:240px;height:240px;margin:20px 0\\'><p style=\\'font-family:monospace;font-size:24px;font-weight:bold;color:#0EA5E9\\'>${token}</p><p style=\\'font-size:13px;color:#666\\'>Válido por 7 días</p></div>', 'QR Registro')">
             🖨 Imprimir QR
           </button>
         </div>
@@ -467,7 +472,7 @@ const Repartidor = {
           <div class="form-row">
             <div class="form-group">
               <label>Hora Límite de Pedidos</label>
-              <input type="time" id="hora-limite" value="${ruta?.horaLimitePedido || '08:00'}">
+              <input type="time" id="hora-limite" value="${ruta?.horaLimitePedido || '19:00'}">
               <span class="form-hint">Los clientes no podrán modificar pedidos después de esta hora</span>
             </div>
             <div style="display:flex;align-items:flex-end;padding-bottom:.25rem">

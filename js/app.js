@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 //  APP.js — Motor principal de la aplicación
 //  Pollos Frescos
 // ============================================================
@@ -72,9 +72,13 @@ const App = {
       // Ocultar pantalla de carga
       await this._hideSplash();
 
-      // Comprobar si viene un token de invitación en la URL (?token=INV-XXXXX)
+      // Comprobar si viene un token de invitación en la URL (?token=INV-XXXXX o #token=INV-XXXXX)
       const urlParams = new URLSearchParams(window.location.search);
-      const inviteToken = urlParams.get('token') || (window.location.hash.includes('token=') ? window.location.hash.split('token=')[1] : null);
+      let inviteToken = urlParams.get('token') || urlParams.get('invite');
+      if (!inviteToken && window.location.hash) {
+        const hashMatch = window.location.hash.match(/token=([a-zA-Z0-9_-]+)/i);
+        if (hashMatch) inviteToken = hashMatch[1];
+      }
 
       // Comprobar sesión
       const session = Auth.getSession();
@@ -90,7 +94,7 @@ const App = {
               document.getElementById('verify-token-btn')?.click();
               Toast.info('Código de invitación cargado automáticamente desde el enlace / QR');
             }
-          }, 300);
+          }, 350);
         }
       }
 
@@ -263,7 +267,7 @@ const App = {
     });
 
     // ── Cerrar sesión
-    document.getElementById('logout-btn')?.addEventListener('click', () => {
+    const handleLogout = () => {
       Modal.show('🔐 Cerrar Sesión', '<p>¿Seguro que deseas cerrar sesión?</p>', [
         { text: 'Cancelar', cls: 'btn--outline', action: () => Modal.hide() },
         { text: 'Cerrar Sesión', cls: 'btn--error', action: () => {
@@ -272,7 +276,9 @@ const App = {
           this.showAuth('login');
         }}
       ]);
-    });
+    };
+    document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
+    document.getElementById('mobile-logout-btn')?.addEventListener('click', handleLogout);
 
     // ── Modal close
     document.getElementById('modal-close')?.addEventListener('click', () => Modal.hide());

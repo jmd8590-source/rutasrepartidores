@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 //  CLIENTE.js — Módulo del Cliente
 //  Pollos Frescos
 // ============================================================
@@ -174,31 +174,47 @@ const Cliente = {
     const todayPedido = DB.findOne('pedidos', p => p.clienteId === cli.id && p.fecha === today);
     const isEditable = todayPedido && todayPedido.estado === 'pendiente' && abierto;
 
-    const disponibilidades = DB.find('disponibilidad', d => d.rutaId === cli.rutaId && d.fecha === today && d.disponible);
+    const productos = DB.find('productos', p => p.activo !== false);
     const categorias = DB.get('categorias');
 
-    if (!disponibilidades.length) {
+    // Mapear productos disponibles para la ruta y día de hoy
+    // Por defecto todos los productos activos están disponibles, a menos que el repartidor o superadmin haya indicado sin existencias
+    const prodsDisponibles = productos.filter(p => {
+      const d = DB.findOne('disponibilidad', disp => disp.rutaId === cli.rutaId && disp.fecha === today && disp.productoId === p.id);
+      if (d) {
+        if (d.disponible === false) return false;
+        if (d.cantidadDisponible !== null && d.cantidadDisponible !== undefined && d.cantidadDisponible <= 0) return false;
+      }
+      return true;
+    }).map(p => {
+      const d = DB.findOne('disponibilidad', disp => disp.rutaId === cli.rutaId && disp.fecha === today && disp.productoId === p.id);
+      const cat = DB.findById('categorias', p.categoriaId);
+      return {
+        ...p,
+        dispPrecio: d ? d.precio : p.precioBase,
+        dispCantidad: d?.cantidadDisponible ?? null,
+        dispLimite: d?.limitePorCliente ?? null,
+        catNombre: cat?.nombre || '',
+        catId: p.categoriaId
+      };
+    });
+
+    if (!prodsDisponibles.length) {
       return `
         <div class="empty-state">
-          <div class="empty-icon">📭</div>
-          <h3>Sin disponibilidad configurada</h3>
-          <p>Tu repartidor aún no ha configurado los productos disponibles para hoy.</p>
+          <div class="empty-icon">📦</div>
+          <h3>Sin productos disponibles</h3>
+          <p>No hay existencias de productos disponibles para realizar pedidos en este momento.</p>
         </div>
       `;
     }
 
-    const prodsByDisp = disponibilidades.map(d => {
-      const prod = DB.findById('productos', d.productoId);
-      const cat = DB.findById('categorias', prod?.categoriaId);
-      return prod ? { ...prod, dispPrecio: d.precio, dispCantidad: d.cantidadDisponible, dispLimite: d.limitePorCliente, catNombre: cat?.nombre || '', catId: prod.categoriaId } : null;
-    }).filter(Boolean);
-
-    const byCategory = Utils.groupBy(prodsByDisp, 'categoriaId');
+    const byCategory = Utils.groupBy(prodsDisponibles, 'categoriaId');
 
     return `
       ${!abierto ? `
         <div class="alert alert--warning mb-4">
-          ⏰ El plazo de pedidos cerró a las <strong>${ruta?.horaLimitePedido}</strong>. No puedes realizar ni modificar pedidos.
+          ⏰ El plazo de pedidos cerró a las <strong>${ruta?.horaLimitePedido || '19:00'}</strong>. No puedes realizar ni modificar pedidos.
         </div>` : ''}
 
       ${todayPedido && !isEditable ? `
@@ -326,10 +342,13 @@ const Cliente = {
           const addBtn = footer.querySelector('.qty-btn');
           if (addBtn) {
             const prod = DB.findById('productos', productoId);
-            const disp = DB.findOne('disponibilidad', d => d.productoId === productoId);
+            const cli = this._getClienteProfile();
+            const today = Utils.today();
+            const disp = cli ? DB.findOne('disponibilidad', d => d.rutaId === cli.rutaId && d.fecha === today && d.productoId === productoId) : null;
+            const precio = disp ? disp.precio : (prod?.precioBase || 0);
             footer.innerHTML = `
-              <div class="product-price">${Utils.formatCurrency(disp?.precio || prod?.precioBase || 0)} <span>/ ${Utils.esc(prod?.unidadVenta || '')}</span></div>
-              <button class="product-add-btn" onclick="Cliente.addToCart('${productoId}',${disp?.precio || prod?.precioBase},'${Utils.esc(prod?.nombre || '')}','${Utils.esc(prod?.unidadVenta || '')}',${disp?.limitePorCliente || 'null'})">+</button>
+              <div class="product-price">${Utils.formatCurrency(precio)} <span>/ ${Utils.esc(prod?.unidadVenta || '')}</span></div>
+              <button class="product-add-btn" onclick="Cliente.addToCart('${productoId}',${precio},'${Utils.esc(prod?.nombre || '')}','${Utils.esc(prod?.unidadVenta || '')}',${disp?.limitePorCliente || 'null'})">+</button>
             `;
           }
         }
@@ -534,21 +553,34 @@ const Cliente = {
     const ruta = DB.findById('rutas', cli.rutaId);
     const today = Utils.today();
 
-    // Cargar líneas al carrito verificando disponibilidad
-    const disponibles = DB.find('disponibilidad', d => d.rutaId === cli.rutaId && d.fecha === today && d.disponible);
-    const dispMap = {};
-    disponibles.forEach(d => dispMap[d.productoId] = d);
+    // Cargar líneas al carrito verificando disponibilidad (por defecto todos disponibles salvo sin existencias)
+    const productos = DB.find('productos', p => p.activo !== false);
+    const prodMap = {};
+    productos.forEach(p => {
+      const d = DB.findOne('disponibilidad', disp => disp.rutaId === cli.rutaId && disp.fecha === today && disp.productoId === p.id);
+      const isAvailable = !d || (d.disponible !== false && (d.cantidadDisponible === null || d.cantidadDisponible === undefined || d.cantidadDisponible > 0));
+      if (isAvailable) {
+        prodMap[p.id] = {
+          ...p,
+          precio: d ? d.precio : p.precioBase,
+          limite: d?.limitePorCliente || null
+        };
+      }
+    });
 
     this._cart = [];
     let notAvail = 0;
     (p.lineas || []).forEach(l => {
-      const d = dispMap[l.productoId];
-      if (d) {
+      const avail = prodMap[l.productoId];
+      if (avail) {
         this._cart.push({
-          productoId: l.productoId, nombre: l.nombre || Utils.getProductoNombre(l.productoId),
-          precioUnitario: d.precio, unidadVenta: l.unidadVenta || '',
-          cantidad: l.cantidad, subtotal: parseFloat((l.cantidad * d.precio).toFixed(2)),
-          limite: d.limitePorCliente || null
+          productoId: l.productoId,
+          nombre: l.nombre || Utils.getProductoNombre(l.productoId),
+          precioUnitario: avail.precio,
+          unidadVenta: l.unidadVenta || avail.unidadVenta || '',
+          cantidad: l.cantidad,
+          subtotal: parseFloat((l.cantidad * avail.precio).toFixed(2)),
+          limite: avail.limite
         });
       } else notAvail++;
     });

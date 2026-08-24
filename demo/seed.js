@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 //  SEED DATA — Pollos Frescos
 //  Datos de demostración para pruebas
 // ============================================================
@@ -13,7 +13,7 @@ window.Seed = {
   },
 
   async init() {
-    if (localStorage.getItem('pf_seed_version') === 'v5') return;
+    if (localStorage.getItem('pf_seed_version') === 'v6') return;
     console.log('🌱 Inicializando datos de demostración...');
 
     // --- Hashes de contraseñas ---
@@ -187,19 +187,19 @@ window.Seed = {
         id: 'ruta-001', nombre: 'Ruta Madrid Norte',
         descripcion: 'Zona norte de Madrid: Hortaleza, Barajas, San Blas',
         repartidorId: 'user-rep-001', activa: true,
-        horaLimitePedido: '08:00', creadaEn: '2025-01-05T10:00:00Z'
+        horaLimitePedido: '19:00', creadaEn: '2025-01-05T10:00:00Z'
       },
       {
         id: 'ruta-002', nombre: 'Ruta Madrid Sur',
         descripcion: 'Zona sur de Madrid: Vallecas, Villaverde, Usera',
         repartidorId: 'user-rep-002', activa: true,
-        horaLimitePedido: '07:30', creadaEn: '2025-01-05T10:00:00Z'
+        horaLimitePedido: '19:00', creadaEn: '2025-01-05T10:00:00Z'
       },
       {
         id: 'ruta-003', nombre: 'Ruta Corredor Henares',
         descripcion: 'Alcalá, Torrejón, Coslada, Mejorada',
         repartidorId: 'user-rep-003', activa: true,
-        horaLimitePedido: '08:30', creadaEn: '2025-01-06T10:00:00Z'
+        horaLimitePedido: '19:00', creadaEn: '2025-01-06T10:00:00Z'
       }
     ];
     localStorage.setItem('pf_rutas', JSON.stringify(rutas));
@@ -615,7 +615,7 @@ window.Seed = {
     // --- INVITACIONES ---
     localStorage.setItem('pf_invitaciones', JSON.stringify([]));
 
-    localStorage.setItem('pf_seed_version', 'v5');
+    localStorage.setItem('pf_seed_version', 'v6');
     console.log('✅ Datos de demostración inicializados');
   },
 

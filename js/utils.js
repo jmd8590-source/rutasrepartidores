@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 //  UTILS.js — Utilidades globales
 //  Pollos Frescos
 // ============================================================
@@ -355,6 +355,69 @@ const Utils = {
   getRegisterLink(token) {
     const origin = window.location.origin + window.location.pathname;
     return `${origin}?token=${encodeURIComponent(token)}`;
+  },
+
+  // Copiar al portapapeles con fallback seguro para móvil
+  async copyToClipboard(text, successMsg = 'Copiado al portapapeles') {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        if (typeof Toast !== 'undefined') Toast.success(successMsg);
+        return true;
+      }
+    } catch (e) {
+      // Fallback
+    }
+
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.top = '-9999px';
+      textarea.style.left = '-9999px';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      if (successful) {
+        if (typeof Toast !== 'undefined') Toast.success(successMsg);
+        return true;
+      }
+    } catch (err) {
+      console.warn('[Utils] Fallback copy error:', err);
+    }
+
+    if (typeof Toast !== 'undefined') Toast.info(`Copia este código/enlace: ${text}`);
+    return false;
+  },
+
+  // Compartir invitación usando Web Share API en móvil o fallback a WhatsApp
+  async shareInvitation(token, link) {
+    const shareData = {
+      title: 'Invitación a Pollos Frescos',
+      text: `¡Hola! Únete como cliente a Pollos Frescos para realizar tus pedidos de reparto. Código de invitación: ${token}`,
+      url: link
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        if (typeof Toast !== 'undefined') Toast.success('Invitación compartida');
+        return;
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.warn('[Utils] Error en navigator.share:', err);
+        }
+      }
+    }
+
+    // Fallback WhatsApp
+    const waText = encodeURIComponent(`¡Hola! Accede al registro de clientes de Pollos Frescos con este enlace: ${link} (Código: ${token})`);
+    window.open(`https://api.whatsapp.com/send?text=${waText}`, '_blank');
   },
 
   // Obtener nombre y email del usuario actual

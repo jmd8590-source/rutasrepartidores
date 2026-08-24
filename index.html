@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -349,14 +349,20 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
       <div class="content-header">
-        <div style="display:flex;align-items:center;gap:.75rem">
+        <div class="content-header-left">
           <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Abrir menú">☰</button>
           <div>
             <h2 id="page-title">Dashboard</h2>
             <p id="page-subtitle" class="page-subtitle"></p>
           </div>
         </div>
-        <div class="header-actions" id="header-actions"></div>
+        <div class="content-header-right">
+          <div class="header-actions" id="header-actions"></div>
+          <button class="mobile-logout-btn" id="mobile-logout-btn" aria-label="Cerrar sesión" title="Cerrar sesión">
+            <span class="mobile-logout-icon">🚪</span>
+            <span class="mobile-logout-text">Salir</span>
+          </button>
+        </div>
       </div>
 
       <div class="content-body" id="main-content">

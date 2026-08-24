@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 //  SUPERADMIN.js — Módulo del Superadministrador
 //  Pollos Frescos
 // ============================================================
@@ -262,7 +262,7 @@ const SuperAdmin = {
           </div>
           <div class="form-group">
             <label>Hora Límite de Pedidos</label>
-            <input type="time" id="ruta-hora" value="${ruta?.horaLimitePedido || '08:00'}">
+            <input type="time" id="ruta-hora" value="${ruta?.horaLimitePedido || '19:00'}">
             <span class="form-hint">Los clientes no podrán pedir después de esta hora</span>
           </div>
         </div>
